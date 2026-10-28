@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Swap – Buy & sell on campus</title>
+<style>
+:root{--bg:#f4f5fb;--card:#fff;--text:#161a2b;--muted:#6b7280;--brand:#5b4df0;--brand2:#8b5cf6;--border:#e6e8f0;--ok:#16a34a;--bad:#e11d48;--warn:#d97706;--shadow:0 6px 24px rgba(30,30,80,.08)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f111a;--card:#181b27;--text:#eef0f8;--muted:#9aa1b5;--border:#2a2e3f;--shadow:0 6px 24px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+a{color:var(--brand)}
+header{background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.logo{font-weight:800;font-size:1.3rem;cursor:pointer;background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sp{flex:1}
+button{font:inherit;font-size:.9rem;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border:0;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:600;transition:.15s}
+button:hover{transform:translateY(-1px);filter:brightness(1.07)}button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+button.sec{background:transparent;color:var(--text);border:1px solid var(--border);font-weight:500}
+button.ok{background:var(--ok)}button.danger{background:var(--bad)}button.sm{padding:6px 12px;font-size:.8rem}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 20%,transparent)}
+.hero{background:linear-gradient(120deg,var(--brand),var(--brand2) 60%,#ec4899);color:#fff;padding:44px 24px 70px;text-align:center}
+.hero h2{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.4rem)}.hero p{margin:0 0 20px;opacity:.9}
+.search{max-width:620px;margin:0 auto;display:flex;gap:8px}.search input{border:0;box-shadow:var(--shadow);color:#161a2b;background:#fff}
+main{max-width:1180px;margin:-40px auto 40px;padding:0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:16px;margin-bottom:20px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{background:transparent;color:var(--muted);border:1px solid transparent;padding:8px 14px;font-weight:600}
+.tab.active{background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand)}
+.dot{background:var(--bad);color:#fff;border-radius:99px;font-size:.7rem;padding:1px 7px;margin-left:6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+.chip{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:99px;padding:6px 14px;font-weight:500;white-space:nowrap}
+.chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.filters{display:flex;gap:10px;flex-wrap:wrap}.filters>*{flex:1;min-width:110px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:.2s;position:relative;box-shadow:var(--shadow)}
+.card:hover{transform:translateY(-4px)}
+.img{width:100%;height:170px;object-fit:cover;display:block;background:linear-gradient(135deg,var(--border),var(--bg))}
+.ph{display:flex;align-items:center;justify-content:center;font-size:2.4rem;color:var(--muted)}
+.card .b{padding:12px 14px 14px;display:grid;gap:5px}.card h4{margin:0;font-size:1rem}
+.price{font-weight:800;font-size:1.15rem;color:var(--brand)}
+.muted{color:var(--muted);font-size:.84rem}.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tag{font-size:.72rem;background:color-mix(in srgb,var(--brand) 12%,transparent);color:var(--brand);padding:3px 9px;border-radius:99px;font-weight:600;display:inline-block}
+.tag.grey{background:var(--bg);color:var(--muted)}
+.heart{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.92);color:#999;border-radius:50%;width:36px;height:36px;padding:0;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
+.heart.on{color:var(--bad)}
+.soldbadge{position:absolute;top:10px;left:10px;background:var(--bad);color:#fff;font-weight:700;font-size:.72rem;padding:4px 10px;border-radius:99px}
+.card.sold .img{filter:grayscale(1);opacity:.6}
+.empty{text-align:center;color:var(--muted);padding:56px 0;grid-column:1/-1}
+.modal{position:fixed;inset:0;background:rgba(10,10,25,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal.open{display:flex}.box{background:var(--card);border-radius:20px;padding:24px;width:100%;max-width:460px;max-height:92vh;overflow:auto;box-shadow:var(--shadow);position:relative}
+.box.wide{max-width:880px;padding:0}.box h2{margin-top:0}.box label{display:block;margin:12px 0 5px;font-size:.82rem;color:var(--muted);font-weight:600}
+.x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;padding:0;background:var(--card);color:var(--text);border:1px solid var(--border);z-index:2}
+.detail{display:grid;grid-template-columns:1.1fr 1fr}@media(max-width:720px){.detail{grid-template-columns:1fr}}
+.detail .img{height:100%;min-height:300px;max-height:520px}.dinfo{padding:26px;display:grid;gap:12px;align-content:start}
+.dinfo h2{margin:0}.bigprice{font-size:1.8rem;font-weight:800;color:var(--brand)}
+.seller{display:flex;gap:12px;align-items:center;background:var(--bg);border-radius:12px;padding:12px}
+.av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.buybox{border:1px dashed var(--border);border-radius:12px;padding:14px;display:grid;gap:8px}
+.err{color:var(--bad);font-size:.85rem;min-height:1.1em}.row{display:flex;gap:8px;flex-wrap:wrap}
+.req{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border)}.req:last-child{border:0}
+.req img,.req .rph{width:64px;height:64px;border-radius:10px;object-fit:cover;flex:none;background:var(--border)}
+.st{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:99px;text-transform:uppercase}
+.st.pending{background:#fef3c7;color:var(--warn)}.st.accepted{background:#dcfce7;color:var(--ok)}.st.declined{background:#ffe4e6;color:var(--bad)}
+h3.sec{margin:6px 0 4px}
+#toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:grid;gap:8px;z-index:50}
+.toast{background:#161a2b;color:#fff;padding:11px 18px;border-radius:12px;box-shadow:var(--shadow);animation:in .25s}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo" onclick="setTab('browse')">🎓 Campus Swap</span><div class="sp"></div>
+  <span id="hello" class="muted"></span>
+  <button onclick="needAuth(()=>open_('sellModal'))">+ Sell an item</button>
+  <button id="btnLogin" class="sec" onclick="open_('authModal')">Login / Sign up</button>
+  <button id="btnLogout" class="sec" style="display:none" onclick="logout()">Logout</button>
+</header>
+
+<section class="hero">
+  <h2>Buy & sell anything on campus</h2>
+  <p>Books, gadgets, cycles, hostel stuff — from students, for students.</p>
+  <div class="search"><input id="q" placeholder="Search for books, laptops, cycles…" oninput="debounce()"></div>
+</section>
+
+<main>
+  <div class="panel">
+    <div class="tabs" id="tabs"></div>
+    <div id="browseTools">
+      <div class="chips" id="chips"></div>
+      <div class="filters">
+        <select id="sort" onchange="load()"><option value="new">Newest first</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="popular">Most viewed</option></select>
+        <input id="min" type="number" min="0" placeholder="Min ₹" oninput="debounce()">
+        <input id="max" type="number" min="0" placeholder="Max ₹" oninput="debounce()">
+      </div>
+    </div>
+  </div>
+  <div id="grid" class="grid"></div>
+  <div id="reqs" class="panel" style="display:none"></div>
+</main>
+<footer>Campus Swap · meet in public campus places and inspect items before paying.</footer>
+
+<!-- Auth -->
+<div class="modal" id="authModal"><div class="box">
+  <h2 id="authTitle">Welcome back</h2>
+  <div id="regOnly" style="display:none"><label>Full name</label><input id="aName"><label>Phone (optional)</label><input id="aPhone"></div>
+  <label>Email</label><input id="aEmail" type="email">
+  <label>Password</label><input id="aPass" type="password">
+  <div class="err" id="authErr"></div>
+  <div class="row"><button onclick="submitAuth()" id="authBtn">Login</button><button class="sec" onclick="close_('authModal')">Cancel</button></div>
+  <p class="muted"><a href="#" onclick="toggleAuth();return false" id="authSwitch">New here? Create an account</a></p>
+</div></div>
+
+<!-- Sell -->
+<div class="modal" id="sellModal"><div class="box">
+  <h2>Sell an item</h2>
+  <label>Title</label><input id="sTitle" maxlength="80">
+  <label>Description</label><textarea id="sDesc" rows="3" placeholder="Age, condition, reason for selling…"></textarea>
+  <div class="row"><div style="flex:1"><label>Price (₹)</label><input id="sPrice" type="number" min="0"></div>
+  <div style="flex:1"><label>Condition</label><select id="sCond"><option>New</option><option>Like new</option><option selected>Good</option><option>Fair</option></select></div></div>
+  <label>Category</label><select id="sCat"></select>
+  <label>Photo</label><input id="sImg" type="file" accept="image/*">
+  <div class="err" id="sellErr"></div>
+  <div class="row"><button onclick="postItem()">Post listing</button><button class="sec" onclick="close_('sellModal')">Cancel</button></div>
+</div></div>
+
+<!-- Item detail (buyer page) -->
+<div class="modal" id="itemModal"><div class="box wide" id="detail"></div></div>
+<div id="toasts"></div>
+
+<script>
+const CATS=['Books','Electronics','Furniture','Clothing','Cycles','Stationery','Hostel Essentials','Other'];
+const ICON={Books:'📚',Electronics:'💻',Furniture:'🪑',Clothing:'👕',Cycles:'🚲',Stationery:'✏️','Hostel Essentials':'🛏️',Other:'📦'};
+let me=null,tab='browse',cat='All',isReg=false,timer;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const open_=id=>$(id).classList.add('open'),close_=id=>$(id).classList.remove('open');
+const money=n=>'₹'+Number(n).toLocaleString('en-IN');
+const when=d=>new Date(d+'Z').toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+const debounce=()=>{clearTimeout(timer);timer=setTimeout(load,250)};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;$('toasts').append(t);setTimeout(()=>t.remove(),3200)}
+async function api(url,opt){const r=await fetch(url,opt);const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Request failed');return d}
+const jpost=(url,body,method='POST')=>api(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});
+
+$('sCat').innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');
+function renderChips(){$('chips').innerHTML=['All',...CATS].map(c=>`<button class="chip ${c===cat?'active':''}" onclick="cat='${c}';renderChips();load()">${ICON[c]||'✨'} ${c}</button>`).join('')}
+function renderTabs(){
+  const t=[['browse','🛍️ Browse'],['wish','❤️ Wishlist'],['mine','📦 My listings'],['requests','📬 Requests']];
+  $('tabs').innerHTML=t.map(([k,l])=>`<button class="tab ${tab===k?'active':''}" onclick="setTab('${k}')">${l}${k==='requests'&&me&&me.pending?`<span class="dot">${me.pending}</span>`:''}</button>`).join('');
+}
+function setTab(t){if(t!=='browse'&&!me)return open_('authModal');tab=t;renderTabs();load()}
+function needAuth(fn){me?fn():open_('authModal')}
+
+function toggleAuth(){isReg=!isReg;$('regOnly').style.display=isReg?'block':'none';
+  $('authTitle').textContent=isReg?'Create your account':'Welcome back';$('authBtn').textContent=isReg?'Sign up':'Login';
+  $('authSwitch').textContent=isReg?'Already have an account? Login':'New here? Create an account';$('authErr').textContent=''}
+async function submitAuth(){
+  try{const body={email:$('aEmail').value,password:$('aPass').value};
+    if(isReg){body.name=$('aName').value;body.phone=$('aPhone').value}
+    await jpost(isReg?'/api/register':'/api/login',body);close_('authModal');toast(isReg?'Account created 🎉':'Logged in');await init();
+  }catch(e){$('authErr').textContent=e.message}
+}
+async function logout(){await jpost('/api/logout');tab='browse';await init();toast('Logged out')}
+
+async function init(){
+  me=await api('/api/me');
+  $('hello').textContent=me?`Hi, ${me.name.split(' ')[0]} 👋`:'';
+  $('btnLogin').style.display=me?'none':'';$('btnLogout').style.display=me?'':'none';
+  renderTabs();renderChips();load();
+}
+async function load(){
+  if(tab==='requests')return loadRequests();
+  $('reqs').style.display='none';$('grid').style.display='';$('browseTools').style.display=tab==='browse'||tab==='wish'?'':'none';
+  const p=new URLSearchParams({q:$('q').value,category:cat,sort:$('sort').value,min:$('min').value,max:$('max').value});
+  if(tab==='mine')p.set('mine','1');if(tab==='wish')p.set('fav','1');
+  const items=await api('/api/items?'+p);
+  const msg={browse:'No items found. Try another search!',wish:'Your wishlist is empty. Tap the ♥ on items you like.',mine:"You haven't listed anything yet."}[tab];
+  $('grid').innerHTML=items.length?items.map(card).join(''):`<div class="empty">${msg}</div>`;
+}
+function card(i){
+  return `<div class="card ${i.sold?'sold':''}" onclick="openItem(${i.id})">
+    ${i.image?`<img class="img" loading="lazy" src="/uploads/${esc(i.image)}" alt="">`:`<div class="img ph">${ICON[i.category]||'📦'}</div>`}
+    ${i.sold?'<span class="soldbadge">SOLD</span>':''}
+    <button class="heart ${i.fav?'on':''}" title="Wishlist" onclick="event.stopPropagation();fav(${i.id})">${i.fav?'♥':'♡'}</button>
+    <div class="b"><div class="price">${money(i.price)}</div><h4 class="clamp">${esc(i.title)}</h4>
+    <div><span class="tag">${esc(i.category)}</span> <span class="tag grey">${esc(i.item_condition||'Good')}</span></div>
+    <div class="muted">${esc(i.seller_name)} · ${when(i.created_at)} · 👁 ${i.views||0}</div></div></div>`;
+}
+async function fav(id){if(!me)return open_('authModal');await jpost(`/api/items/${id}/fav`);load();if($('itemModal').classList.contains('open'))openItem(id,true)}
+
+// ----- buyer detail page -----
+async function openItem(id,keep){
+  const i=await api('/api/items/'+id);const own=me&&me.id===i.user_id;const r=i.my_request;
+  let action='';
+  if(own){
+    action=`<div class="buybox"><b>This is your listing</b><div class="muted">${i.request_count} pending request(s)</div>
+      <div class="row"><button class="ok sm" onclick="toggleSold(${i.id})">${i.sold?'Relist':'Mark as sold'}</button>
+      <button class="danger sm" onclick="del(${i.id})">Delete</button><button class="sec sm" onclick="closeItem();setTab('requests')">View requests</button></div></div>`;
+  }else if(i.sold){action=`<div class="buybox"><b>😕 This item has been sold</b></div>`;}
+  else if(!me){action=`<div class="buybox"><b>Want this item?</b><button onclick="closeItem();open_('authModal')">Login to buy</button></div>`;}
+  else if(r&&r.status==='pending'){action=`<div class="buybox"><b>Request sent <span class="st pending">pending</span></b><div class="muted">Your offer: ${money(r.offer_price)}. The seller will respond soon.</div>
+      <button class="sec sm" onclick="cancelReq(${r.id},${i.id})">Cancel request</button></div>`;}
+  else{action=`<div class="buybox"><b>Buy / make an offer</b>
+      <input id="offer" type="number" min="0" value="${i.price}" placeholder="Your offer (₹)">
+      <textarea id="msg" rows="2" placeholder="Message to seller (optional) – e.g. when can we meet?"></textarea>
+      <div class="err" id="reqErr"></div><button onclick="sendReq(${i.id})">Send buy request</button>
+      ${r&&r.status==='declined'?'<div class="muted">Your previous request was declined — you can try again.</div>':''}</div>`;}
+  const contact=me?`<div class="muted">📧 <a href="mailto:${esc(i.seller_email)}">${esc(i.seller_email)}</a>${i.seller_phone?' · 📞 '+esc(i.seller_phone):''}</div>`:`<div class="muted">Log in to see contact details</div>`;
+  $('detail').innerHTML=`<button class="x" onclick="closeItem()">✕</button><div class="detail">
+    ${i.image?`<img class="img" src="/uploads/${esc(i.image)}" alt="">`:`<div class="img ph" style="font-size:5rem">${ICON[i.category]||'📦'}</div>`}
+    <div class="dinfo"><div><span class="tag">${esc(i.category)}</span> <span class="tag grey">${esc(i.item_condition||'Good')}</span> ${i.sold?'<span class="st declined">sold</span>':''}</div>
+    <h2>${esc(i.title)}</h2><div class="bigprice">${money(i.price)}</div>
+    <div style="white-space:pre-wrap">${esc(i.description)||'<span class="muted">No description.</span>'}</div>
+    <div class="muted">Posted ${when(i.created_at)} · 👁 ${i.views} views</div>
+    <div class="seller"><div class="av">${esc(i.seller_name[0]).toUpperCase()}</div><div><b>${esc(i.seller_name)}</b>${contact}</div></div>
+    ${action}
+    <button class="sec sm" onclick="fav(${i.id})">${i.fav?'♥ Saved to wishlist':'♡ Add to wishlist'}</button></div></div>`;
+  open_('itemModal');
+}
+function closeItem(){close_('itemModal');load()}
+async function sendReq(id){
+  try{await jpost(`/api/items/${id}/requests`,{offer_price:$('offer').value,message:$('msg').value});toast('Request sent to seller ✅');openItem(id)}
+  catch(e){$('reqErr').textContent=e.message}
+}
+async function cancelReq(rid,id){await api('/api/requests/'+rid,{method:'DELETE'});toast('Request cancelled');openItem(id)}
+
+// ----- requests page -----
+async function loadRequests(){
+  $('grid').style.display='none';$('browseTools').style.display='none';$('reqs').style.display='';
+  const [rec,sent]=await Promise.all([api('/api/requests/received'),api('/api/requests/sent')]);
+  const row=(r,isRec)=>`<div class="req">${r.image?`<img src="/uploads/${esc(r.image)}" alt="">`:'<div class="rph"></div>'}
+    <div style="flex:1;display:grid;gap:4px"><b style="cursor:pointer" onclick="openItem(${r.item_id})">${esc(r.title)}</b>
+    <div class="muted">${isRec?'Buyer':'Seller'}: ${esc(r.other_name)} · Listed ${money(r.price)} · Offer <b>${money(r.offer_price)}</b> · ${when(r.created_at)}</div>
+    ${r.message?`<div>“${esc(r.message)}”</div>`:''}
+    ${(isRec||r.status==='accepted')?`<div class="muted">📧 ${esc(r.other_email)}${r.other_phone?' · 📞 '+esc(r.other_phone):''}</div>`:''}
+    <div><span class="st ${r.status}">${r.status}</span></div></div>
+    ${isRec&&r.status==='pending'?`<div class="row"><button class="ok sm" onclick="respond(${r.id},'accepted')">Accept</button><button class="danger sm" onclick="respond(${r.id},'declined')">Decline</button></div>`:''}
+    ${!isRec&&r.status==='pending'?`<button class="sec sm" onclick="cancelReq(${r.id},0);loadRequests()">Cancel</button>`:''}</div>`;
+  $('reqs').innerHTML=`<h3 class="sec">📥 Requests on my items</h3>${rec.length?rec.map(r=>row(r,true)).join(''):'<p class="muted">No one has requested your items yet.</p>'}
+    <h3 class="sec" style="margin-top:22px">📤 Requests I sent</h3>${sent.length?sent.map(r=>row(r,false)).join(''):'<p class="muted">You haven\'t requested anything. Browse and tap an item to buy!</p>'}`;
+}
+async function respond(id,status){await jpost('/api/requests/'+id,{status},'PATCH');toast(status==='accepted'?'Accepted – item marked sold':'Declined');await init();setTab('requests')}
+
+async function postItem(){
+  try{const fd=new FormData();fd.append('title',$('sTitle').value);fd.append('description',$('sDesc').value);fd.append('price',$('sPrice').value);
+    fd.append('category',$('sCat').value);fd.append('item_condition',$('sCond').value);if($('sImg').files[0])fd.append('image',$('sImg').files[0]);
+    await api('/api/items',{method:'POST',body:fd});close_('sellModal');['sTitle','sDesc','sPrice','sImg'].forEach(i=>$(i).value='');
+    $('sellErr').textContent='';toast('Listing posted 🎉');setTab('mine');
+  }catch(e){$('sellErr').textContent=e.message}
+}
+async function toggleSold(id){await api(`/api/items/${id}/sold`,{method:'PATCH'});toast('Updated');openItem(id)}
+async function del(id){if(confirm('Delete this listing?')){await api('/api/items/'+id,{method:'DELETE'});closeItem();toast('Deleted')}}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){m.classList.remove('open');if(m.id==='itemModal')load()}}));
+init();
+</script>
+</body>
+</html>
